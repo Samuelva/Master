@@ -19,11 +19,27 @@ def main(network_data, network_name):
     in_degree_counts = Counter(dict(network.in_degree()).values())
     out_degree_counts = Counter(dict(network.out_degree()).values())
 
-    connected_components(network)
+    # connected_components(network)
 
     # plot_degree(in_degree_counts, network_name, "in")
     # plot_degree(out_degree_counts, network_name, "out")
+    distances(network)
 
+def distances(network):
+    shortest_distances = nx.all_pairs_shortest_path(network)
+    distance_distribution = {}
+
+    for node in shortest_distances:
+        for paths in shortest_distances[node].values():
+            path_length = len(paths)-1
+            if path_length not in distance_distribution:
+                distance_distribution[path_length] = 1
+            else:
+                distance_distribution[path_length] += 1
+    print(distance_distribution)
+    del distance_distribution[0]
+    distribution_plot(list(distance_distribution.keys()), list(distance_distribution.values()))
+                
 
 def connected_components(network):
     scc = nx.number_strongly_connected_components(network)
@@ -36,10 +52,13 @@ def connected_components(network):
 def plot_degree1(degree, network, type):
     number_of_links = sorted(list(degree.keys()))
     frequency = list(degree.values())
-    x_axis = np.arange(len(number_of_links))
+    # x_axis = np.arange(len(number_of_links))
+    distribution_plot()
 
-    plt.bar(frequency, x_axis)
-    plt.yticks(x_axis, number_of_links, rotation="vertical")
+
+def distribution_plot(x, y):
+    plt.bar(x, y)
+    # plt.yticks(y, number_of_links, rotation="vertical")
     plt.xlabel("Number of links between nodes")
     plt.ylabel("Frequency")
 
@@ -91,3 +110,12 @@ def plot_degree(degree, network, type):
 
 if __name__ == "__main__":
     main(sys.argv[1], sys.argv[2])
+
+"""
+for x in distance:
+    for y in distance[x].values():
+        if len(y)-1 not in testdict:
+            testdict[len(y)-1] = 1
+        else:
+            testdict[len(y)-1] += 1
+"""
