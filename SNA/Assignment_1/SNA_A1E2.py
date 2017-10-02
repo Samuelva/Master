@@ -2,6 +2,10 @@
 Run: python3 SNA_A1E2.py medium.in medium
 Required packages:
 python3-tk
+networkx
+scipy
+matplotlib
+numpy
 """
 import sys
 import networkx as nx
@@ -11,22 +15,21 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import spline
 
 def main(network_data, network_name):
-    # large = nx.read_adjlist("/media/samuel/Danker/School_data/SNA/large.in", create_using=nx.DiGraph())
-    network = nx.read_edgelist(network_data, create_using=nx.DiGraph())
-    # medium_graph = nx.read_adjlist("/media/samuel/Danker/School_data/SNA/medium.in")
-    # large.number_of_nodes()
-    # large.number_of_edges()
+    network = nx.read_edgelist(network_data, \
+        create_using=nx.DiGraph())
+    print(network.number_of_nodes())
+    print(network.number_of_edges())
     in_degree_counts = Counter(dict(network.in_degree()).values())
     out_degree_counts = Counter(dict(network.out_degree()).values())
 
     # connected_components(network)
 
     # plot_degree(in_degree_counts, network_name, "in")
-    # plot_degree(out_degree_counts, network_name, "out")
+    # plot_degree1(out_degree_counts, network_name, "out")
     distances(network)
 
 def distances(network):
-    shortest_distances = nx.all_pairs_shortest_path(network)
+    shortest_distances = dict(nx.all_pairs_shortest_path(network))
     distance_distribution = {}
 
     for node in shortest_distances:
@@ -42,23 +45,30 @@ def distances(network):
                 
 
 def connected_components(network):
-    scc = nx.number_strongly_connected_components(network)
-    wcc = nx.number_weakly_connected_components(network)
+    n_scc = nx.number_strongly_connected_components(network)
+    n_wcc = nx.number_weakly_connected_components(network)
 
-    print("# of strongly connected components: " + str(scc))
-    print("# of weakly connected components: " + str(wcc))
+    print("# of strongly connected components: " + str(n_scc))
+    print("# of weakly connected components: " + str(n_wcc))
+    n_scc = nx.strongly_connected_component_subgraphs(network)
+    print(max(n_scc, key=len).number_of_edges())
+
 
 
 def plot_degree1(degree, network, type):
     number_of_links = sorted(list(degree.keys()))
     frequency = list(degree.values())
     # x_axis = np.arange(len(number_of_links))
-    distribution_plot()
+    distribution_plot(number_of_links, frequency)
+
+
 
 
 def distribution_plot(x, y):
-    plt.bar(x, y)
+    plt.plot(x, y)
     # plt.yticks(y, number_of_links, rotation="vertical")
+    # plt.xscale("log")
+    plt.yscale("log")
     plt.xlabel("Number of links between nodes")
     plt.ylabel("Frequency")
 
